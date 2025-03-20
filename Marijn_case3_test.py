@@ -7,11 +7,16 @@ import pandas as pd
 # Laad de fietsstations data
 cyclestations_data = pd.read_csv('cycle_stations_updated.csv')
 
-# Convert 'Datetime' column to a readable string format (if it's not already in string format)
+# Converteer 'Datetime' naar datetime formaat
 cyclestations_data['Datetime'] = pd.to_datetime(cyclestations_data['Datetime'], errors='coerce')
 
-# Vervang NaN-waarden in 'Datetime' door 'Installatiedatum niet bekend'
-cyclestations_data['Datetime'] = cyclestations_data['Datetime'].fillna('Installatiedatum niet bekend').dt.strftime('%Y-%m-%d')
+# Vervang NaN-waarden in 'Datetime' door 'Installatiedatum niet bekend' (we bewaren de datums als datetime objecten)
+cyclestations_data['Formatted Datetime'] = cyclestations_data['Datetime'].fillna(pd.NaT)
+
+# Voeg de 'Installatiedatum niet bekend' toe voor de NaT-waarden
+cyclestations_data['Formatted Datetime'] = cyclestations_data['Formatted Datetime'].apply(
+    lambda x: x.strftime('%Y-%m-%d') if pd.notna(x) else 'Installatiedatum niet bekend'
+)
 
 # Maak een Streamlit app layout
 st.title('London Cycle Stations')
@@ -34,7 +39,7 @@ for index, row in cyclestations_data.iterrows():
     nb_bikes = row['nbBikes']  # Aantal fietsen
     nb_standard_bikes = row['nbStandardBikes']  # Aantal standaardfietsen
     nb_ebikes = row['nbEBikes']  # Aantal ebikes
-    install_date = row['Datetime']  # Installatiedatum van het station
+    install_date = row['Formatted Datetime']  # Installatiedatum van het station (geformatteerd)
 
     # Voeg een marker toe met info over het station
     if nb_bikes >= bike_slider:  # Controleer of het aantal fietsen groter of gelijk is aan de slider
