@@ -1,4 +1,3 @@
-
 import streamlit as st
 import folium
 from folium.plugins import MarkerCluster
@@ -6,9 +5,9 @@ from streamlit_folium import folium_static  # Importeer folium_static
 import pandas as pd
 
 # Laad de fietsstations data
-cyclestations_data = pd.read_csv('cycle_stations.csv')
+cyclestations_data = pd.read_csv('cycle_stations_updated.csv')
 
-# Create Streamlit app layout
+# Maak een Streamlit app layout
 st.title('London Cycle Stations')
 st.markdown("Interaktive map met fietsverhuurstations in Londen")
 
@@ -29,12 +28,16 @@ for index, row in cyclestations_data.iterrows():
     nb_bikes = row['nbBikes']  # Aantal fietsen
     nb_standard_bikes = row['nbStandardBikes']  # Aantal standaardfietsen
     nb_ebikes = row['nbEBikes']  # Aantal ebikes
+    install_date = row['Datetime']  # Installatiedatum van het station
 
     # Voeg een marker toe met info over het station
     if nb_bikes >= bike_slider:  # Controleer of het aantal fietsen groter of gelijk is aan de slider
         folium.Marker(
             location=[lat, long],
-            popup=folium.Popup(f"Station: {station_name}<br>Aantal fietsen: {nb_bikes}<br>Standaard: {nb_standard_bikes}<br>EBikes: {nb_ebikes}", max_width=300),
+            popup=folium.Popup(
+                f"Station: {station_name}<br>Aantal fietsen: {nb_bikes}<br>Standaard: {nb_standard_bikes}<br>EBikes: {nb_ebikes}<br>Installatie datum: {install_date}",
+                max_width=300
+            ),
             icon=folium.Icon(color='blue', icon='info-sign')
         ).add_to(marker_cluster)
 
