@@ -13,9 +13,6 @@ weer_data_2021 = weer_data[weer_data['Date'].dt.year == 2021]
 # Maak de Streamlit-app
 st.title('Weerdata voor 2021')
 
-# Keuze voor de weergave: specifieke datum of specifieke week
-keuze = st.radio("Kies een weergave:", ('Specifieke Dag', 'Specifieke Week'))
-
 # Vertaling van kolomnamen naar volledige betekenis
 column_mapping = {
     'tavg': 'Gemiddelde Temperatuur (°C)',
@@ -30,47 +27,26 @@ column_mapping = {
     'tsun': 'Zonduur (uren)'
 }
 
-if keuze == 'Specifieke Dag':
-    # Datumkiezer voor een specifieke dag in 2021
-    datum = st.date_input("Selecteer de datum", min_value=pd.to_datetime("2021-01-01"), max_value=pd.to_datetime("2021-12-31"))
+# Kalender om een specifieke datum te kiezen
+datum = st.date_input("Selecteer een datum in 2021", min_value=pd.to_datetime("2021-01-01"), max_value=pd.to_datetime("2021-12-31"))
 
-    # Filter de data voor de geselecteerde datum
-    filtered_data = weer_data_2021[weer_data_2021['Date'] == datum]
+# Haal het weeknummer van de geselecteerde datum op
+week_nummer = datum.isocalendar()[1]
 
-    # Toon de gegevens voor de geselecteerde datum
-    if not filtered_data.empty:
-        st.write(f"Gegevens voor {datum.strftime('%d-%m-%Y')}:")
-        # Vervang kolomnamen met de vertaalde versie
-        filtered_data = filtered_data.rename(columns=column_mapping)
+# Filter de data voor de geselecteerde week
+weer_data_2021['Week'] = weer_data_2021['Date'].dt.isocalendar().week
+filtered_data_week = weer_data_2021[weer_data_2021['Week'] == week_nummer]
 
-        # Zorg ervoor dat de juiste kolommen worden weergegeven
-        st.dataframe(filtered_data[['Date', 'Gemiddelde Temperatuur (°C)', 'Minimale Temperatuur (°C)', 
+# Toon de gegevens voor de geselecteerde week
+if not filtered_data_week.empty:
+    st.write(f"Gegevens voor week {week_nummer} van 2021 (rondom {datum.strftime('%d-%m-%Y')}):")
+    # Vervang kolomnamen met de vertaalde versie
+    filtered_data_week = filtered_data_week.rename(columns=column_mapping)
+
+    # Zorg ervoor dat de juiste kolommen worden weergegeven
+    st.dataframe(filtered_data_week[['Date', 'Gemiddelde Temperatuur (°C)', 'Minimale Temperatuur (°C)', 
                                      'Maximale Temperatuur (°C)', 'Neerslag (mm)', 'Sneeuwval (cm)', 
                                      'Windrichting (°)', 'Windsnelheid (m/s)', 'Windstoten (m/s)', 
                                      'Luchtdruk (hPa)', 'Zonduur (uren)']])
-    else:
-        st.write("Geen gegevens gevonden voor de geselecteerde datum.")
-
-elif keuze == 'Specifieke Week':
-    # Keuze voor weeknummer (1 t/m 52)
-    week_nummer = st.slider("Kies een weeknummer", 1, 52)
-
-    # Voeg een kolom voor weeknummer toe aan de dataset
-    weer_data_2021['Week'] = weer_data_2021['Date'].dt.isocalendar().week
-
-    # Filter de data voor de geselecteerde week
-    filtered_data_week = weer_data_2021[weer_data_2021['Week'] == week_nummer]
-
-    # Toon de gegevens voor de geselecteerde week
-    if not filtered_data_week.empty:
-        st.write(f"Gegevens voor week {week_nummer} van 2021:")
-        # Vervang kolomnamen met de vertaalde versie
-        filtered_data_week = filtered_data_week.rename(columns=column_mapping)
-
-        # Zorg ervoor dat de juiste kolommen worden weergegeven
-        st.dataframe(filtered_data_week[['Date', 'Gemiddelde Temperatuur (°C)', 'Minimale Temperatuur (°C)', 
-                                         'Maximale Temperatuur (°C)', 'Neerslag (mm)', 'Sneeuwval (cm)', 
-                                         'Windrichting (°)', 'Windsnelheid (m/s)', 'Windstoten (m/s)', 
-                                         'Luchtdruk (hPa)', 'Zonduur (uren)']])
-    else:
-        st.write(f"Geen gegevens gevonden voor week {week_nummer} van 2021.")
+else:
+    st.write(f"Geen gegevens gevonden voor week {week_nummer} van 2021.")
