@@ -43,10 +43,11 @@ if not filtered_data_week.empty:
     # Vervang kolomnamen met de vertaalde versie
     filtered_data_week = filtered_data_week.rename(columns=column_mapping)
 
-    # Reset de index en toon de tabel zonder de index kolom
+    # Reset de index en voeg de aangepaste index toe die begint bij 1
     filtered_data_week_reset = filtered_data_week.reset_index(drop=True)
+    filtered_data_week_reset.index = filtered_data_week_reset.index + 1  # Start de index vanaf 1
 
-    # Zorg ervoor dat de juiste kolommen worden weergegeven zonder index
+    # Zorg ervoor dat de juiste kolommen worden weergegeven zonder de oude index
     st.dataframe(filtered_data_week_reset[['Date', 'Gemiddelde Temperatuur (°C)', 'Minimale Temperatuur (°C)', 
                                            'Maximale Temperatuur (°C)', 'Neerslag (mm)', 'Sneeuwval (cm)', 
                                            'Windrichting (°)', 'Windsnelheid (m/s)', 'Windstoten (m/s)', 
