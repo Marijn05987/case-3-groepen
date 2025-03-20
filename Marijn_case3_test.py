@@ -8,7 +8,10 @@ import pandas as pd
 cyclestations_data = pd.read_csv('cycle_stations_updated.csv')
 
 # Convert 'Datetime' column to a readable string format (if it's not already in string format)
-cyclestations_data['Datetime'] = pd.to_datetime(cyclestations_data['Datetime'], errors='coerce').dt.strftime('%Y-%m-%d')
+cyclestations_data['Datetime'] = pd.to_datetime(cyclestations_data['Datetime'], errors='coerce')
+
+# Vervang NaN-waarden in 'Datetime' door 'Installatiedatum niet bekend'
+cyclestations_data['Datetime'] = cyclestations_data['Datetime'].fillna('Installatiedatum niet bekend').dt.strftime('%Y-%m-%d')
 
 # Maak een Streamlit app layout
 st.title('London Cycle Stations')
