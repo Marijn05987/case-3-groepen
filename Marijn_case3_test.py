@@ -43,10 +43,13 @@ if not filtered_data_week.empty:
     # Vervang kolomnamen met de vertaalde versie
     filtered_data_week = filtered_data_week.rename(columns=column_mapping)
 
+    # Reset de index en toon de tabel zonder de index kolom
+    filtered_data_week_reset = filtered_data_week.reset_index(drop=True)
+
     # Zorg ervoor dat de juiste kolommen worden weergegeven zonder index
-    st.dataframe(filtered_data_week[['Date', 'Gemiddelde Temperatuur (°C)', 'Minimale Temperatuur (°C)', 
-                                     'Maximale Temperatuur (°C)', 'Neerslag (mm)', 'Sneeuwval (cm)', 
-                                     'Windrichting (°)', 'Windsnelheid (m/s)', 'Windstoten (m/s)', 
-                                     'Luchtdruk (hPa)', 'Zonduur (uren)']], index=False)
+    st.dataframe(filtered_data_week_reset[['Date', 'Gemiddelde Temperatuur (°C)', 'Minimale Temperatuur (°C)', 
+                                           'Maximale Temperatuur (°C)', 'Neerslag (mm)', 'Sneeuwval (cm)', 
+                                           'Windrichting (°)', 'Windsnelheid (m/s)', 'Windstoten (m/s)', 
+                                           'Luchtdruk (hPa)', 'Zonduur (uren)']])
 else:
     st.write(f"Geen gegevens gevonden voor week {week_nummer} van 2021.")
