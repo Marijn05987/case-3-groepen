@@ -1,17 +1,12 @@
-#
+
 import streamlit as st
 import folium
 from folium.plugins import MarkerCluster
 from streamlit_folium import folium_static  # Importeer folium_static
 import pandas as pd
 
-# Laad de bestanden
+# Laad de fietsstations data
 cyclestations_data = pd.read_csv('cycle_stations.csv')
-bestanden = ['2021_Q2_Central.csv', '2021_Q3_Central.csv', '2021_Q4_Central.csv']
-fiets_data_jaar = pd.concat([pd.read_csv(file) for file in bestanden], ignore_index=True)
-
-# Weerdata en metrodata zijn geladen, maar niet nodig voor de map zelf.
-# We gaan nu een interactieve map maken met de fietsstations.
 
 # Create Streamlit app layout
 st.title('London Cycle Stations')
