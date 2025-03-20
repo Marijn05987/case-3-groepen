@@ -38,9 +38,10 @@ for index, row in cyclestations_data.iterrows():
         folium.Marker(
             location=[lat, long],
             popup=folium.Popup(
-                f"Station: {station_name}<br>Aantal fietsen: {nb_bikes}<br>Standaard: {nb_standard_bikes}<br>EBikes: {nb_ebikes}<br>Installatie datum: {install_date}",
+                f"Station: {station_name}<br>Aantal fietsen: {nb_bikes}<br>Standaard: {nb_standard_bikes}<br>EBikes: {nb_ebikes}",
                 max_width=300
             ),
+            tooltip=f"Installatie datum: {install_date}",  # Toon de installatie datum in de tooltip
             icon=folium.Icon(color='blue', icon='info-sign')
         ).add_to(marker_cluster)
 
