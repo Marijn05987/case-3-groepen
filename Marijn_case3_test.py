@@ -1,49 +1,28 @@
 import streamlit as st
-import folium
-from folium.plugins import MarkerCluster
-from streamlit_folium import folium_static  # Importeer folium_static
 import pandas as pd
 
-# Laad de fietsstations data
-cyclestations_data = pd.read_csv('cycle_stations_updated.csv')
+# Laad de weerdata
+weer_data = pd.read_csv('weather_london.csv')
 
-# Convert 'Datetime' column to a readable string format (if it's not already in string format)
-cyclestations_data['Datetime'] = pd.to_datetime(cyclestations_data['Datetime'], errors='coerce').dt.strftime('%Y-%m-%d')
+# Zet de 'Unnamed: 0' kolom om naar een datetime-object
+weer_data['Date'] = pd.to_datetime(weer_data['Unnamed: 0'], format='%Y-%m-%d')
 
-# Maak een Streamlit app layout
-st.title('London Cycle Stations')
-st.markdown("Interaktive map met fietsverhuurstations in Londen")
+# Maak de Streamlit-app
+st.title('Weerdata per Dag')
 
-# Voeg een slider toe om het aantal fietsen in te stellen
-bike_slider = st.slider("Selecteer het aantal beschikbare fietsen", 0, 100, 0)
+# Voeg een jaarkiezer toe
+jaar = st.selectbox("Selecteer het jaar", sorted(weer_data['Date'].dt.year.unique()))
 
-# Maak een basemap van Londen
-m = folium.Map(location=[51.5074, -0.1278], zoom_start=12)
+# Voeg een dagkiezer toe, die afhankelijk is van het geselecteerde jaar de juiste dagen toont
+dagen_in_jaar = weer_data[weer_data['Date'].dt.year == jaar]['Date'].dt.day.unique()
+dag = st.selectbox("Selecteer de dag", sorted(dagen_in_jaar))
 
-# MarkerCluster om stations te groeperen
-marker_cluster = MarkerCluster().add_to(m)
+# Filter de data voor het geselecteerde jaar en de geselecteerde dag
+filtered_data = weer_data[(weer_data['Date'].dt.year == jaar) & (weer_data['Date'].dt.day == dag)]
 
-# Voeg de stations toe aan de kaart
-for index, row in cyclestations_data.iterrows():
-    lat = row['lat']
-    long = row['long']
-    station_name = row['name']
-    nb_bikes = row['nbBikes']  # Aantal fietsen
-    nb_standard_bikes = row['nbStandardBikes']  # Aantal standaardfietsen
-    nb_ebikes = row['nbEBikes']  # Aantal ebikes
-    install_date = row['Datetime']  # Installatiedatum van het station
-
-    # Voeg een marker toe met info over het station
-    if nb_bikes >= bike_slider:  # Controleer of het aantal fietsen groter of gelijk is aan de slider
-        folium.Marker(
-            location=[lat, long],
-            popup=folium.Popup(
-                f"Station: {station_name}<br>Aantal fietsen: {nb_bikes}<br>Standaard: {nb_standard_bikes}<br>EBikes: {nb_ebikes}",
-                max_width=300
-            ),
-            tooltip=f"Installatie datum: {install_date}",  # Toon de installatie datum in de tooltip
-            icon=folium.Icon(color='blue', icon='info-sign')
-        ).add_to(marker_cluster)
-
-# Render de kaart in de Streamlit app
-folium_static(m)
+# Toon de gegevens voor de geselecteerde dag
+if not filtered_data.empty:
+    st.write(f"Gegevens voor {dag}-{jaar}:")
+    st.dataframe(filtered_data[['Date', 'tavg', 'tmin', 'tmax', 'prcp', 'snow', 'wdir', 'wspd', 'wpgt', 'pres', 'tsun']])
+else:
+    st.write("Geen gegevens gevonden voor de geselecteerde datum.")
